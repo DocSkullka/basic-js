@@ -1,52 +1,52 @@
-const { NotImplementedError } = require("../extensions/index.js");
+const { NotImplementedError } = require('../extensions/index.js');
 
 /**
  * Implement chainMaker object according to task description
- *
+ * 
  */
-
 const chainMaker = {
-  arr: [],
+
   getLength() {
-    return this.arr.length;
+    return this.chain.length
   },
   addLink(value) {
-    if (typeof value === "undefined") {
-      this.arr.push(`( )~~`);
-    } else {
-      this.arr.push(`( ${value} )~~`);
+    if (!this.chain) {
+      this.chain = [];
     }
-    return this;
+    if (value === undefined) {
+      this.chain.push('( )');
+    } else {
+      this.chain.push(`( ${value} )`);
+    }
+    return this
   },
   removeLink(position) {
-    if (
-      isNaN(position) ||
-      !Number.isInteger(position) ||
-      position > this.arr.length - 1 ||
-      position <= 0
-    ) {
-      this.arr = [];
-      throw new Error("You can't remove incorrect link!");
-    } else {
-      this.arr.splice(position - 1, 1);
-      return this;
+    if (!this.chain) {
+      this.chain = [];
     }
+    if (typeof position === 'number' && (position - 1) in this.chain) {
+      this.chain.splice(position - 1, 1)
+    } else {
+      this.chain = [];
+      throw new Error("You can't remove incorrect link!");
+    }
+
+    return this
   },
   reverseChain() {
-    this.arr.reverse();
-    return this;
+    if (!this.chain) {
+      this.chain = [];
+    }
+    this.chain.reverse();
+    return this
   },
   finishChain() {
-    let elemToModif = this.arr[this.arr.length - 1]; // string
-    let corrElem = elemToModif.substring(0, elemToModif.length - 2);
-    this.arr.pop();
-    this.arr.push(corrElem);
-    let str = this.arr.join("");
-    this.arr = [];
-    return str;
-  },
+    const chainStr = this.chain.join('~~');
+    this.chain = [];
+    return chainStr
+  }
 };
 
 module.exports = {
-  chainMaker,
+  chainMaker
 };

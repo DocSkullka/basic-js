@@ -1,53 +1,63 @@
-const { NotImplementedError } = require("../extensions/index.js");
+const { NotImplementedError } = require('../extensions/index.js');
 
 /**
  * Create transformed array based on the control sequences that original
  * array contains
- *
+ * 
  * @param {Array} arr initial array
  * @returns {Array} transformed array
- *
+ * 
  * @example
- *
+ * 
  * transform([1, 2, 3, '--double-next', 4, 5]) => [1, 2, 3, 4, 4, 5]
  * transform([1, 2, 3, '--discard-prev', 4, 5]) => [1, 2, 4, 5]
- *
+ * 
  */
 function transform(arr) {
-  if (!Array.isArray(arr)) {
-    throw new Error("'arr' parameter must be an instance of the Array!");
-  }
-  let clone = [...arr];
-  console.log(clone);
-  let resultedArr = [];
+  if (!Array.isArray(arr)) throw new Error("'arr' parameter must be an instance of the Array!");
 
-  for (let i = 0; i < clone.length; i++) {
-    console.log(clone[i]);
-    if (clone[i] === "--double-next") {
-      if (clone[i + 1]) {
-        resultedArr.push(clone[i + 1]);
-      } else {
-        i++;
-      }
-    } else if (clone[i] === "--double-prev") {
-      if (clone[i - 2] !== "--discard-next" && clone[i - 2]) {
-        resultedArr.push(clone[i - 1]);
-      }
-    } else if (clone[i] === "--discard-next") {
-      if (clone[i + 1]) {
-        i++;
-      }
-    } else if (clone[i] === "--discard-prev") {
-      if (clone[i - 2] !== "--discard-next") {
-        resultedArr.pop();
-      }
-    } else {
-      resultedArr.push(clone[i]);
+  if (arr.length === 0) return arr
+
+  const instructions = ['--discard-next','--discard-prev','--double-next','--double-prev'];
+  const result = [];
+  let i = 0;
+
+  while (i < arr.length) {
+    switch (arr[i]) {
+      case '--discard-next':
+        if (arr[i + 1] && !instructions.includes(arr[i + 1])) {
+          i += 1;
+        }
+        result.push('')
+        break
+      case '--discard-prev':
+        if (result[result.length - 1]) {
+          result.pop()
+        }
+        result.push('')
+        break
+      case '--double-next':
+        if (arr[i + 1] && !instructions.includes(arr[i + 1])) {
+          result.push(arr[i + 1])
+          result.push(arr[i + 1])
+          i += 1;
+        }
+        break
+      case '--double-prev': 
+        if (result[result.length - 1]) {
+          result.push(result[i - 1])
+        }
+        result.push('')
+        break
+      default:
+        result.push(arr[i])
     }
+    i += 1;
   }
-  return resultedArr;
+
+  return result.filter(item => item)
 }
 
 module.exports = {
-  transform,
+  transform
 };
